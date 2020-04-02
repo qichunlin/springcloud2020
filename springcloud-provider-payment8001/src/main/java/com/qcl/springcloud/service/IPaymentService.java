@@ -10,10 +10,21 @@ import org.apache.ibatis.annotations.Param;
  * @description
  * @date 2020/4/2
  */
-@Mapper
 public interface IPaymentService {
 
+    /**
+     * 创建
+     *
+     * @param payment
+     * @return
+     */
     public int create(Payment payment);
 
+    /**
+     * 通过id获取支付对象
+     *
+     * @param id
+     * @return
+     */
     public Payment getPaymentById(@Param("id") Long id);
 }
