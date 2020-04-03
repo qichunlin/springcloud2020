@@ -13,6 +13,12 @@
 
 
     <dependencies>
+        <!--引入自定义的通用包(工程重构)-->
+        <dependency>
+            <groupId>com.qcl.springcloud</groupId>
+            <artifactId>springcloud-api-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!--web启动器-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -64,9 +70,9 @@
         </dependency>
 
         <!--Eureka客户端-->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>-->
+        </dependency>
     </dependencies>
 </project>

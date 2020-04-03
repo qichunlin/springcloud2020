@@ -13,6 +13,12 @@
     <artifactId>springcloud-consumer-order80</artifactId>
 
     <dependencies>
+        <!--引入自定义的通用包(工程重构)-->
+        <dependency>
+            <groupId>com.qcl.springcloud</groupId>
+            <artifactId>springcloud-api-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- SpringBoot整合Web组件 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
