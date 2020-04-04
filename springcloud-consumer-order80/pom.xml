@@ -13,6 +13,11 @@
     <artifactId>springcloud-consumer-order80</artifactId>
 
     <dependencies>
+        <!--Eureka客户端-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <!--引入自定义的通用包(工程重构)-->
         <dependency>
             <groupId>com.qcl.springcloud</groupId>
