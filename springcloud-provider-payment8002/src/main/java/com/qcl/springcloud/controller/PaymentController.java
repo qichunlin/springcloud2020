@@ -6,7 +6,10 @@ import com.qcl.springcloud.service.IPaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * @author chunlin.qi@hand-china.com
@@ -51,5 +54,13 @@ public class PaymentController {
         } else {
             return new CommonResult(444, "查询失败,没有对应id:{}记录,serverPort:" + serverPort, null);
         }
+    }
+
+    @Resource
+    private DiscoveryClient discoveryClient;
+
+    @GetMapping("/discovery")
+    public Object discovery(){
+        return this.discoveryClient;
     }
 }

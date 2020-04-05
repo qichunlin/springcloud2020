@@ -3,6 +3,7 @@ package com.qcl.springcloud.controller;
 import com.qcl.springcloud.commons.CommonResult;
 import com.qcl.springcloud.entities.Payment;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,5 +35,14 @@ public class OrderController {
     @GetMapping("/api/payment/query/{id}")
     public CommonResult<Payment> getPayment(@PathVariable("id") Long id) {
         return restTemplate.getForObject(PAYMENT_URL + "/api/payment/query/" + id, CommonResult.class);
+    }
+
+
+    @Resource
+    private DiscoveryClient discoveryClient;
+
+    @GetMapping("/discovery")
+    public Object discovery(){
+        return this.discoveryClient;
     }
 }
