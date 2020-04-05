@@ -6,7 +6,12 @@ import com.qcl.springcloud.service.IPaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author chunlin.qi@hand-china.com
@@ -51,5 +56,37 @@ public class PaymentController {
         } else {
             return new CommonResult(444, "查询失败,没有对应id:{}记录,serverPort:" + serverPort, null);
         }
+    }
+
+
+    /**
+     * 对外暴露的服务发现的一些信息
+     */
+    @Resource
+    private DiscoveryClient discoveryClient;
+
+    @GetMapping("/discovery")
+    public Object discovery() {
+        //获取EurekaServer上面所有的Application
+        List<String> discoveryClientServices = discoveryClient.getServices();
+        //SPRINGCLOUD-ORDER-SERVICE  SPRINGCLOUD-PAYMENT-SERVICE
+        for (String application : discoveryClientServices) {
+            log.info("******application******:{}", application);
+        }
+
+        //根据服务名称获取对应的实例信息
+        List<ServiceInstance> discoveryClientInstances = discoveryClient.getInstances("SPRINGCLOUD-PAYMENT-SERVICE");
+        // payment8002 , payment8001
+        for (ServiceInstance serviceInstance : discoveryClientInstances) {
+            log.info("******serviceInstance******:{}", serviceInstance);
+            log.info("实例名称:{},主机名称:{},端口号:{},URI地址:{}",
+                    serviceInstance.getServiceId(),
+                    serviceInstance.getHost(),
+                    serviceInstance.getPort(),
+                    serviceInstance.getUri()
+            );
+        }
+
+        return this.discoveryClient;
     }
 }
