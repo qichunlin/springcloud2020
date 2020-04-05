@@ -19,7 +19,8 @@ import javax.annotation.Resource;
 @RequestMapping("/consumer")
 public class OrderController {
 
-    public static final String PAYMENT_URL = "http://localhost:8001";
+    //public static final String PAYMENT_URL = "http://localhost:8001";
+    public static final String PAYMENT_URL = "http://SPRINGCLOUD-PAYMENT-SERVICE";
 
     @Resource
     private RestTemplate restTemplate;
