@@ -4,6 +4,7 @@ import com.qcl.springcloud.commons.CommonResult;
 import com.qcl.springcloud.entities.Payment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,11 +39,23 @@ public class OrderController {
     }
 
 
+    @GetMapping("/api/payment/getForEntity/query/{id}")
+    public CommonResult<Payment> getPayment2(@PathVariable("id") Long id) {
+        //返回对象为ResponseEntity对象包含了响应的状态码\响应头
+        ResponseEntity<CommonResult> entity = restTemplate.getForEntity(PAYMENT_URL + "/api/payment/query/" + id, CommonResult.class);
+        if (entity.getStatusCode().is2xxSuccessful()) {
+            return entity.getBody();
+        } else {
+            return new CommonResult<>(444, "操作失败");
+        }
+    }
+
+
     @Resource
     private DiscoveryClient discoveryClient;
 
     @GetMapping("/discovery")
-    public Object discovery(){
+    public Object discovery() {
         return this.discoveryClient;
     }
 }
