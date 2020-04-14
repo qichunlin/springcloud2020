@@ -2,13 +2,18 @@ package com.qcl.springcloud.controller;
 
 import com.qcl.springcloud.commons.CommonResult;
 import com.qcl.springcloud.entities.Payment;
+import com.qcl.springcloud.loadbalance.LoadBalancer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.net.URI;
+import java.util.List;
 
 /**
  * @author chunlin.qi@hand-china.com
@@ -57,5 +62,25 @@ public class OrderController {
     @GetMapping("/discovery")
     public Object discovery() {
         return this.discoveryClient;
+    }
+
+
+    /**
+     * 手写Load Balance 轮询算法
+     */
+    @Resource
+    private LoadBalancer loadBalancer;
+
+    @GetMapping(value = "/consumer/payment/lb")
+    public String getPaymentLoadBalance() {
+        List<ServiceInstance> serviceInstanceList = discoveryClient.getInstances("SPRINGCLOUD-PAYMENT-SERVICE");
+
+        if (CollectionUtils.isEmpty(serviceInstanceList)) {
+            return null;
+        }
+        //获取提供服务的实例对象
+        ServiceInstance serviceInstance = loadBalancer.instances(serviceInstanceList);
+        URI uri = serviceInstance.getUri();
+        return restTemplate.getForObject(uri + "/payment/lb", String.class);
     }
 }
