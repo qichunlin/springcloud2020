@@ -7,6 +7,7 @@ eureka:
     service-url:
       defaultZone: http://eureka7001.com:7001/eureka/
 
+#开启feign的hystrix功能
 feign:
   hystrix:
     enabled: true

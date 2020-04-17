@@ -6,6 +6,8 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
+ * EnableHystrix启用注解
+ *
  * @author chunlin.qi@hand-china.com
  * @version 1.0
  * @description
