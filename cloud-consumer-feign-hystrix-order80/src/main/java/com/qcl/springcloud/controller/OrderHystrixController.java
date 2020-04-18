@@ -33,7 +33,7 @@ public class OrderHystrixController {
 
     /**
      * 超时处理方法
-     *
+     * @ HystrixCommand 单独使用该注解说明使用了全局的默认处理方法,没有特别指明就是用全局默认的
      * @param id
      * @return
      */
@@ -41,6 +41,7 @@ public class OrderHystrixController {
     @HystrixCommand(fallbackMethod = "paymentTimeOutFallbackMethod", commandProperties = {
             @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "1500")
     })
+    //@HystrixCommand
     public String paymentInfo_TimeOut(@PathVariable("id") Integer id) {
         int age = 10 / 0;
         String result = paymentHystrixService.paymentInfo_TimeOut(id);
