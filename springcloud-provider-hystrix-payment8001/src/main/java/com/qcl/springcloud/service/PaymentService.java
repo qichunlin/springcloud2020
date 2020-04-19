@@ -56,6 +56,7 @@ public class PaymentService {
         if (id < 0) {
             throw new RuntimeException("******id 不能负数");
         }
+        //huTool工具包
         String serialNumber = IdUtil.simpleUUID();
 
         return Thread.currentThread().getName() + "\t" + "调用成功，流水号: " + serialNumber;
