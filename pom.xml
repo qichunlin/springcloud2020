@@ -25,6 +25,7 @@
         <module>springcloud-provider-hystrix-payment8001</module>
         <module>springcloud-consumer-hystrix-dashboard9001</module>
         <module>springcloud-gateway-gateway9527</module>
+        <module>springcloud-config-center-3344</module>
     </modules>
 
     <!--统一管理jar包和版本-->
