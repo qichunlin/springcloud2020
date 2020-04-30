@@ -26,6 +26,7 @@
         <module>springcloud-consumer-hystrix-dashboard9001</module>
         <module>springcloud-gateway-gateway9527</module>
         <module>springcloud-config-center-3344</module>
+        <module>springcloud-config-client-3355</module>
     </modules>
 
     <!--统一管理jar包和版本-->

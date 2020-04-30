@@ -1,0 +1,12 @@
+1.Config动态刷新之手动版(*改配置  * 发送post请求刷新通知)
+
+  (1)在文件中配置的@RefreshScope 注解以及配置文件中加的暴露端口还是没有实现动态刷新的效果
+
+    -->解决办法: 发一个post请求去刷新3355 必须是post请求
+        curl -X POST "http://localhost:3355/actuator/refresh"
+
+
+注意:不加-X参数默认是GET 请求方式
+
+
+避免了服务的重启
