@@ -28,8 +28,8 @@
         </dependency>
         <!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
         <dependency>
-            <groupId>com.atguigu.springcloud</groupId>
-            <artifactId>cloud-api-commons</artifactId>
+            <groupId>com.qcl.springcloud</groupId>
+            <artifactId>springcloud-api-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!--web-->
