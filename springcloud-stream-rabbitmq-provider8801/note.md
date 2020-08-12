@@ -176,6 +176,133 @@ eureka:
   访问 http://localhost:8801/sendMessage
 
 
-https://www.bilibili.com/video/BV18E411x7eT?p=88
+### 消息驱动之消费者
+新建Module springcloud-stream-rabbitmq-consumer8802
+
+POM
+```xml
+<!--引入spring-cloud-starter-stream-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+</dependency>
+```
+
+YML
+```yml
+server:
+  port: 8802
+
+spring:
+  application:
+    name: springcloud-stream-consumer
+  cloud:
+      stream:
+        binders: # 在此处配置要绑定的rabbitmq的服务信息；
+          defaultRabbit: # 表示定义的名称，用于于binding整合
+            type: rabbit # 消息组件类型
+            environment: # 设置rabbitmq的相关的环境配置
+              spring:
+                rabbitmq:
+                  host: localhost
+                  port: 5672
+                  username: guest
+                  password: guest
+        bindings: # 服务的整合处理
+          input: # 这个名字是一个通道的名称(接受消息)
+            destination: studyExchange # 表示要使用的Exchange名称定义
+            content-type: application/json # 设置消息类型，本次为对象json，如果是文本则设置“text/plain”
+            binder: defaultRabbit # 设置要绑定的消息服务的具体设置
+
+eureka:
+  client: # 客户端进行Eureka注册的配置
+    service-url:
+      defaultZone: http://localhost:7001/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 2 # 设置心跳的时间间隔（默认是30秒）
+    lease-expiration-duration-in-seconds: 5 # 如果现在超过了5秒的间隔（默认是90秒）
+    instance-id: receive-8802.com  # 在信息列表时显示主机名称
+    prefer-ip-address: true     # 访问的路径变为IP地址
+```
+
+主启动类 (com.qcl.springcloud.StreamMQMain8802)
+
+业务类 (com.qcl.springcloud.controller.ReceiveMessageListenerController)
+
+测试8801发送,8802接收 (http://localhost:8801/sendMessage)
+
+
+### 分组消费与持久化
+依照8802,clone出来一份运行8803 (新建Module springcloud-stream-rabbitmq-consumer8803)-->POM YML 主启动类 业务类
+
+启动：(RabbitMQ、7001服务注册、8801消息生产、8802消息消费、8803消息消费)
+
+#### 运行后两个问题： 1.有重复消费问题 2.消息持久化问题
+
+####消费： 
+目前是8802/8803同时都收到了,存在重复消费问题  
+解决办法:分组和持久化属性group (重点)
+
+  生产实际案例
+     比如在如下场景中，订单系统我们做集群部署，都会从RabbitMQ中获取订单信息，那如果一个订单同时被两个服务获取到，那么就会造成数据错误，我们得避免这种情况。
+     这时我们就可以使用Stream中的消息分组来解决
+     ![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200812105557797-1821320558.png)
+
+```
+studyExchange.anonymous.HZSLToiFRDyH7fLmfkqPlg 8802 (RabbitMQ自动分配)
+studyExchange.anonymous.NkiopRZNRSa-qGn3Y_5AxA 8803 (RabbitMQ自动分配)
+```
+
+故障现象：重复消费
+导致原因：默认分组group是不同的,组流水号不一样,被认为不同组,可以消费
+解决办法：自定义配置分组,自定义配置分为同一组,解决重复消费问题
+
+>注意在Stream中处于同一个group中的多个消费者是竞争关系，就能够保证消息只会被其中一个应用消费一次。
+不同组是可以全面消费的（重复消费）,
+
+
+#### 分组
+原理：微服务应用放置于同一个group中,就能够保证消息只被其中一个应用消费一次。不同的组是可以消费的,同一个组内会发生竞争关系,只有其中一个可以消费 
+
+
+##### 8802/8803都变成不同组,group两个不同
+group：groupA、groupB (自定义分组)
+
+
+8802修改YML
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200812134404486-1331461036.png)
+
+
+8803修改YML
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200812134538124-402810848.png)
+
+
+我们自己配置
+    分布式微服务应用为了实现高可用和负载均衡，实际上都会部署多个实例，本例子启动了两个消费微服务（8802/8803）
+    多数情况，生产者发送消息给某个具体微服务时只希望被消费次，按照上面我们启动两个应用的例子，虽然它们同属一个应用，但是这个消息出现了被重复消费两次的情况。为了解决这个问题，在Spring Cloud Stream中提供了消费组的概念。
+
+结论
+    还是重复消费
+
+
+
+##### 8802/8803实现轮询分组每次只有一个消费者
+8801模块的发的消息只能被8802或8803其中一个接收到,这样避免了重复消费
+
+
+##### 8802/8803都变成相同组,group两个相同
+group:groupA
+
+8802修改YML
+
+8803修改YML
+
+结论：同一个组的多个微服务实例每次只会有一个拿到
+
+    
+    
+持久化
+
+https://www.bilibili.com/video/BV18E411x7eT?p=91
     
    
