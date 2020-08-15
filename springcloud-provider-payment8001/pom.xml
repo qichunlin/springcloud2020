@@ -13,6 +13,11 @@
 
 
     <dependencies>
+        <!--包含了sleuth和zipkin-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
         <!--引入自定义的通用包(工程重构)-->
         <dependency>
             <groupId>com.qcl.springcloud</groupId>
