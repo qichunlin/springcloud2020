@@ -2,6 +2,10 @@
 https://www.bilibili.com/video/BV18E411x7eT?p=5
 https://www.bilibili.com/video/BV18E411x7eT?p=6
 https://www.bilibili.com/video/BV18E411x7eT?p=7
+https://www.bilibili.com/video/BV18E411x7eT?p=8
+https://www.bilibili.com/video/BV18E411x7eT?p=9
+https://www.bilibili.com/video/BV18E411x7eT?p=10
+
 
 ### 约定>配置>构建
 约定大于配置
@@ -182,3 +186,186 @@ dependencyManagement 元素中指定的版本号。然后在子项目里就可�
 
 #### 父工程创建完成
 执行mvn:install将父工程发布到仓库方便子工程继承
+
+
+### Rest工程构建
+
+#### 构建步骤
+
+##### 微服务提供者支付Module模块(springcloud-provider-payment8001)
+微服务构建：<br/>
+- 1.建Module
+springcloud-provider-payment8001
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200401150345308-1253434374.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200401150420162-99487446.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200401150722666-95665594.png)
+
+
+- 2.改POM
+```xml
+<dependencies>
+    <!--web启动器-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <!--监控-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <!--mybatis启动器-->
+    <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-starter</artifactId>
+    </dependency>
+    <!--德鲁伊连接池-->
+    <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid-spring-boot-starter</artifactId>
+    </dependency>
+    <!--mysql驱动-->
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+    <!--jdbc依赖-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <!--热部署-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+        <scope>runtime</scope>
+        <optional>true</optional>
+    </dependency>
+    <!--lombok-->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+    <!--SpringBoot测试-->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+
+    <!--Eureka客户端-->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+    </dependency>
+</dependencies>
+
+```
+
+
+- 3.写YML
+```yml
+#一般一个微服务一个端口号
+server:
+  port: 8001
+
+spring:
+  application:
+    name: springcloud-payment-service #服务名称
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource  #当前数据源操作类型
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3308/springcloud2020?characterEncoding=utf8&useSSL=false&useUnicode=true
+    username: root
+    password: 123456
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.qcl.springcloud.entities  #所有entity别名所在包
+
+```
+
+
+- 4.主启动
+com.qcl.springcloud.PaymentMain8001
+
+
+- 5.业务类
+com.qcl.springcloud.controller.PaymentController
+
+包含以下
+1.建表SQL
+
+```sql
+CREATE TABLE `payment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `serial` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4
+
+```
+
+
+2.entities
+主实体Payment
+**com.qcl.springcloud.entities.Payment**
+
+Json封装体CommonResult
+**com.qcl.springcloud.commons.CommonResult**
+
+
+3.dao
+**com.qcl.springcloud.mapper.PaymentMapper**
+
+mybatis的映射文件
+**resources/mapper/PaymentMapper.xml**
+
+
+4.service
+**com.qcl.springcloud.service.IPaymentService**
+**com.qcl.springcloud.service.impl.PaymentServiceImpl**
+
+
+5.controller
+**com.qcl.springcloud.controller.PaymentController**
+
+
+
+- 测试
+浏览器访问
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403115134593-1439201733.png)
+
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403115117626-1139255783.png)
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403115204585-1450453679.png)
+
+
+postman工具模拟post请求
+
+
+- 运行--->开启RunDashboard控制台
+
+通过修改idea的workspace.xml的方式来快速打开Run Dashboard窗口
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403114943525-1565753255.png)
+
+开启Run Dashboard
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403114908459-1259413188.png)
+
+`搜索RunDashboard 节点下面添加`
+```
+<option name="configurationTypes">
+  <set>
+    <option value="SpringBootApplicationConfigurationType" />
+  </set>
+</option>
+```
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403115051589-2947628.png)
+
+
+- 小总结
+开始说的那五步
