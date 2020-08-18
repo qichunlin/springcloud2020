@@ -1,6 +1,9 @@
 ## 5.Eureka的注册与发现
 https://www.bilibili.com/video/BV18E411x7eT?p=15
 https://www.bilibili.com/video/BV18E411x7eT?p=16
+https://www.bilibili.com/video/BV18E411x7eT?p=17
+https://www.bilibili.com/video/BV18E411x7eT?p=18
+https://www.bilibili.com/video/BV18E411x7eT?p=19
 
 
 ### Eureka基础知识
@@ -42,8 +45,187 @@ EurekaClient通过注册中心进行访问
 
 
 ### 单机Eureka构建步骤
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818231814412-1219936592.png)
+
+#### 生成Eureka Server端服务注册中心 
+- 建Module (springcloud-eureka-server7001)
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403151852223-1404689738.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202004/1231979-20200403151925460-1141631399.png)
+
+- 改POM
+
+**1.X 和 2.X 对比说明**
+```xml
+<!-- 以前的老版本(当前使用2018) -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-eureka</artifactId>
+</dependency>
+
+
+<!--现在新版本(当前使用2020.2)-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+```
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+<!--自定义api通用包-->
+<dependency>
+    <groupId>com.qcl.springcloud</groupId>
+    <artifactId>springcloud-api-commons</artifactId>
+    <version>${project.version}</version>
+</dependency>
+<!--boot web actuator-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <scope>runtime</scope>
+    <optional>true</optional>
+</dependency>
+```
+
+- 改YML
+```yml
+server:
+  port: 7001
+
+#erueka集群原理:相互注册,相互守望
+eureka:
+  instance:
+    hostname: eureka7001.com #eureka服务端实例名称
+  client:
+    #表示不向注册中心注册自己
+    register-with-eureka: false
+    #false表示自己就是注册中心，我的职责就是维护服务实例,并不区检索服务
+    fetch-registry: false
+    service-url:
+      #设置与Eureka Server交互的地址查询服务和注册服务都要依赖这个地址
+      defaultZone: http://eureka7002.com:7002/eureka/
+
+  #禁用eureka的自我保护机制
+#  server:
+#    enable-self-preservation: false
+
+```
+
+
+- 主启动
+
+com.qcl.springcloud.EurekaMain7001
+
+
+- 测试
+
+浏览器访问：http://localhost:7001/
+
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818233057803-1818250154.png)
+
+>没有服务注册进去
+
+
+
+#### Eureka Client端springcloud-provider-payment8001将注册进Eureka Server成为服务提供者provider 
+
+修改Module：springcloud-provider-payment8001
+
+
+修改POM
+**1.X 和 2.X 对比说明**
+```xml
+<!-- 以前老版本，别再使用 -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-eureka</artifactId>
+</dependency>
+
+<!--现在新版本，当前使用 -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+
+
+修改yml
+```yml
+spring:
+  application:
+    name: springcloud-payment-service #服务名称
+
+eureka:
+  client:
+    #表示向注册中心注册自己 默认为true
+    register-with-eureka: true
+    #是否从EurekaServer抓取已有的注册信息，默认为true,单节点无所谓,集群必须设置为true才能配合ribbon使用负载均衡
+    fetch-registry: true
+    service-url:
+      # 入驻地址
+      defaultZone: http://localhost:7001/eureka/   #单机版
+  #服务名称
+  instance:
+    instance-id: payment8001
+    #访问路径显示IP地址
+    prefer-ip-address: true
+```
+
+
+修改主启动
+
+(添加注解 @EnableEurekaClient)
+
+
+测试
+先启动eureka server
+http:localhost:7001
+微服务注册名说明
+
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818234028021-1921160779.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818234015922-743492129.png)
+
+
+
+##### 自我保护机制
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818234123989-1788687786.png)
+
+
+#### Eureka Client端springcloud-consumer-order80将注册进Eureka Server成为服务消费者consumer 
+
+步骤跟 springcloud-provider-payment8001 一样也是使用eureka client端
+
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818234425345-2022782382.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818234417996-1699792700.png)
+
+
+
+#### bug
+
+Failed to bind properties under ' eureka.client.service-url' to java.util.Map <java.lang.String, java.lang.String>
+
+
+解决办法 (层次缩进和空格,两者不能少)
+![](https://img2020.cnblogs.com/blog/1231979/202008/1231979-20200818234615782-395618468.png)
+
+
+
 ### 集群Eureka构建步骤
 ### actuator微服务信息完善
 ### 服务发现Discovery
 ### Eureka自我保护
-https://www.bilibili.com/video/BV18E411x7eT?p=14
