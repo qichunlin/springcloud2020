@@ -1,4 +1,4 @@
-## Zookeeper服务注册与发现
+## 6.Zookeeper服务注册与发现
 https://www.bilibili.com/video/BV18E411x7eT?p=28
 https://www.bilibili.com/video/BV18E411x7eT?p=29
 https://www.bilibili.com/video/BV18E411x7eT?p=30
@@ -306,3 +306,8 @@ spring:
 
 
 访问测试地址  http://localhost/consumer/payment/zk
+
+
+http://archive.apache.org/dist/zookeeper/zookeeper-3.4.9/
+
+wget http://archive.apache.org/dist/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz
