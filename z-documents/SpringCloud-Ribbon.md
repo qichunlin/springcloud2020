@@ -163,7 +163,9 @@ ZoneAvoidanceRule默认规则,复合判断server所在区域的性能和server�
 #### 原理
 
 负载均衡算法：rest接口第几次请求数%服务器集群总数量=实际调用服务器位置下标,每次服务重启动后rest接口计数从1开始。
-List<Servicelnstance>instances =discoveryClient.getlnstances("CLOUD-PAYMENT-SERVICE");
+
+List<Servicelnstance> instances = discoveryClient.getInstances("SPRINGCLOUD-PAYMENT-SERVICE");
+
 如：
 List[0] instances = 127.0.0.1:8002
 List[1] instances = 127.0.0.1:8001
@@ -175,5 +177,122 @@ List[1] instances = 127.0.0.1:8001
 如此类推.…
 
 
-#### 源码
+#### RoundRobinRule源码
+
+**com.netflix.loadbalancerRoundRobinRule**
+
+
+关键点
+```
+private AtomicInteger nextServerCyclicCounter;
+
+
+public Server choose(ILoadBalancer lb, Object key) {
+    if (lb == null) {
+        log.warn("no load balancer");
+        return null;
+    } else {
+        Server server = null;
+        int count = 0;
+
+        while(true) {
+            if (server == null && count++ < 10) {
+                List<Server> reachableServers = lb.getReachableServers();
+                List<Server> allServers = lb.getAllServers();
+                int upCount = reachableServers.size();
+                int serverCount = allServers.size();
+                if (upCount != 0 && serverCount != 0) {
+                    int nextServerIndex = this.incrementAndGetModulo(serverCount);
+                    server = (Server)allServers.get(nextServerIndex);
+                    if (server == null) {
+                        Thread.yield();
+                    } else {
+                        if (server.isAlive() && server.isReadyToServe()) {
+                            return server;
+                        }
+
+                        server = null;
+                    }
+                    continue;
+                }
+
+                log.warn("No up servers available from load balancer: " + lb);
+                return null;
+            }
+
+            if (count >= 10) {
+                log.warn("No available alive servers after 10 tries from load balancer: " + lb);
+            }
+
+            return server;
+        }
+    }
+}
+
+
+//自旋锁
+private int incrementAndGetModulo(int modulo) {
+    int current;
+    int next;
+    do {
+        current = this.nextServerCyclicCounter.get();
+        next = (current + 1) % modulo;
+    } while(!this.nextServerCyclicCounter.compareAndSet(current, next));
+
+    return next;
+}
+```
+
+[自旋锁CAS的相关知识点](https://www.bilibili.com/video/av48988279?from=search&seid=5479711710596585145)
+
+
 #### 手写
+原理 + JUC(CAS+自旋锁)
+
+##### 7001/7002集群启动
+
+##### 8001/8002微服务改造
+
+controller
+
+```
+@GetMapping(value = "/lb")
+public String getPaymentLB(){
+    return serverPort;
+}
+```
+
+##### 80订单微服务改造
+- 1.ApplicationContextBean去掉注解 @LoadBalance
+
+
+- 2.LoadBalance接口
+
+**com.qcl.springcloud.loadbalance.LoadBalancer**
+
+
+- 3.MyLoadBalancer实现类
+
+**com.qcl.springcloud.loadbalance.MyLoadBalancer**
+
+
+- 4.OrderController
+
+```
+@GetMapping(value = "/consumer/payment/lb")
+public String getPaymentLoadBalance() {
+    List<ServiceInstance> serviceInstanceList = discoveryClient.getInstances("SPRINGCLOUD-PAYMENT-SERVICE");
+
+    if (CollectionUtils.isEmpty(serviceInstanceList)) {
+        return null;
+    }
+    //获取提供服务的实例对象
+    ServiceInstance serviceInstance = loadBalancer.instances(serviceInstanceList);
+    URI uri = serviceInstance.getUri();
+    return restTemplate.getForObject(uri + "/payment/lb", String.class);
+}
+```
+
+- 5.测试
+
+http://localhost/consumer/payment/Ib
