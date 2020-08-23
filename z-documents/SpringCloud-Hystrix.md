@@ -313,11 +313,22 @@ http://localhost/consumer/payment/hystrix/ok/1
 
 
 ##### 服务降级
-降级配置  @HystrixCommand
-8001先从自身找问题
+- 降级配置  @HystrixCommand
+
+- 8001先从自身找问题
     设置自身调用超时时间的峰值,峰值内可以正常运行,超过了需要有兜底的方法处理,作服务降级fallback
 
 
+- 8001fallback
+业务类启用 @HystrixCommand报异常后如何处理
+    一旦调用服务方法失败并抛出了错误信息后，会自动调用@HystrixCommand标注好的fallbackMethod调用类中的指定方法
+
+主启动类激活 (添加新注解@EnableCircuitBreaker)
+
+**com.qcl.springcloud.PaymentHystrixMain8001**
+
+
+>无论是在消费者还是提供者都可以做(Hystrix服务降级)超时的配置
 
 ##### 服务熔断
 (服务限流)
