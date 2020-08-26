@@ -6,6 +6,11 @@ https://www.bilibili.com/video/BV18E411x7eT?p=50
 https://www.bilibili.com/video/BV18E411x7eT?p=51
 https://www.bilibili.com/video/BV18E411x7eT?p=52
 https://www.bilibili.com/video/BV18E411x7eT?p=53
+https://www.bilibili.com/video/BV18E411x7eT?p=54
+https://www.bilibili.com/video/BV18E411x7eT?p=55
+https://www.bilibili.com/video/BV18E411x7eT?p=56
+https://www.bilibili.com/video/BV18E411x7eT?p=57
+https://www.bilibili.com/video/BV18E411x7eT?p=58
 
 
 ### 概述
@@ -321,18 +326,56 @@ http://localhost/consumer/payment/hystrix/ok/1
 
 - 8001fallback
 业务类启用 @HystrixCommand报异常后如何处理
-    一旦调用服务方法失败并抛出了错误信息后，会自动调用@HystrixCommand标注好的fallbackMethod调用类中的指定方法
+    一旦调用服务方法失败并抛出了错误信息后,会自动调用@HystrixCommand标注好的fallbackMethod调用类中的指定方法
 
 主启动类激活 (添加新注解@EnableCircuitBreaker)
 
 **com.qcl.springcloud.PaymentHystrixMain8001**
 
 
->无论是在消费者还是提供者都可以做(Hystrix服务降级)超时的配置
-
-##### 服务熔断
-(服务限流)
+>无论是在消费者还是提供者都可以做(Hystrix服务降级)超时的配置,一般fallback服务降级放在客户端
 
 
-### hystrix工作流程
-### 服务监控hystrixDashboard
+- 80fallback
+    80订单微服务,也可以更好的保护自己,自己也依样画葫芦进行客户端降级保护
+    我们自己配置过的热部署方式对java代码的改动明显,但对@HystrixCommand内属性的修改建议重启微服务
+
+主启动类激活 (添加新注解@EnableCircuitBreaker)
+
+
+YML
+```yml
+#开启feign的hystrix功能
+feign:
+  hystrix:
+    enabled: true
+```
+
+
+主启动 (@EnableHystrix)
+
+**com.qcl.springcloud.OrderHystrixMain80**
+
+业务类
+
+**com.qcl.springcloud.controller.OrderHystrixController**
+
+
+目前问题
+    每个业务方法对应一个兜底的方法,代码冗余
+    统一和自定义的分开
+    
+解决问题
+  每个方法配置一个,太繁琐了 
+     Feign接口系列
+     @DefaultProperties(defaultFallback = "payment_Global_FallbackMethod")
+     @HystrixCommand 单独使用该注解说明使用了全局的默认处理方法,没有特别指明就是用全局默认的   
+        
+  和业务逻辑混在一起
+    服务降级,客户端去调用服务端,碰上服务端宕机或关闭 (服务降级在客户端80完成,与服务端8001没有关系,只需要Feign客户端定义的接口添加一个服务降级处理的实现类即可实现解耦)
+    未来要面对的异常(运行时异常、超时、宕机)
+    修改 cloud-consumer-feign-hystrix-order80  已经有了 PaymentHystrixService接口,重新新建一个类(com.qcl.springcloud.service.PaymentFallbackService) 实现该接口,统一为接口里面的方法进行异常处理
+    PaymentFallbackService类实现 PaymentHystrixService
+    PaymentHystrixService类上标记fallback方法的类：@FeignClient(value = "SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT", fallback = PaymentFallbackService.class)
+    故意关闭8001服务
+    客户端自己调用提示：此时服务端provider已经down了,但是我们做了服务降级处理,让客户端在服务端不可用时也会获得提示信息而不会挂起耗死服务器
