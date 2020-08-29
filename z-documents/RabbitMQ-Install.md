@@ -1,0 +1,24 @@
+## SpringCloudBus环境搭建 (由于RabbitMQ运行在Erlang环境中，所以首先安装Erlang)
+注意:版本搭配:https://www.rabbitmq.com/news.html
+
+### 搭建过程
+#### (1)安装Erlang
+http://erlang.org/download/otp_win64_21.3.exe
+
+#### (2)RabbitMQ 3.7.14
+https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Frabbitmq%2Frabbitmq-server%2Freleases%2Fdownload%2Fv3.7.14%2Frabbitmq-server-3.7.14.exe
+
+![](https://img2020.cnblogs.com/blog/1231979/202005/1231979-20200501104742754-758492921.png)
+
+
+#### (3)进入RabbitMQ安装目录下的sbin目录 例如:(D:\software\Rabbitmq\rabbitmq\rabbitmq_server-3.7.14\sbin)
+输入如下命令启动管理:rabbitmq-plugins enable rabbitmq_management
+![](https://img2020.cnblogs.com/blog/1231979/202005/1231979-20200501105800263-2128232486.png)
+
+可视化插件很多自带的有
+
+
+可视化插件中找到rabbitmq-start
+http://localhost:15672/
+
+输入账户密码:guest  guest (默认的)
