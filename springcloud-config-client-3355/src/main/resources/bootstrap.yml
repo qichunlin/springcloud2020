@@ -10,7 +10,7 @@ spring:
     config:
       label: master #分支名称
       name: springcloudconfig #配置文件名称
-      profile: dev #读取后缀名称   上述3个综合：master分支上config-dev.yml的配置文件被读取http://config-3344.com:3344/master/springconfig-dev.yml
+      profile: dev #读取后缀名称   上述3个综合：master分支上springcloudconfig-dev.yml的配置文件被读取http://config-3344.com:3344/master/springcloudconfig-dev.yml
       uri: http://localhost:3344 #配置中心地址k
 
 #测试 (http://config-3344.com:3344/springcloudconfig/dev/master  or  http://config-3344.com:3344/master/springcloudconfig-dev.yml)
