@@ -6,6 +6,8 @@ https://www.bilibili.com/video/BV18E411x7eT?p=123
 https://www.bilibili.com/video/BV18E411x7eT?p=124
 https://www.bilibili.com/video/BV18E411x7eT?p=125
 https://www.bilibili.com/video/BV18E411x7eT?p=126
+https://www.bilibili.com/video/BV18E411x7eT?p=127
+https://www.bilibili.com/video/BV18E411x7eT?p=128
 
 
 ### 降级规则
@@ -313,14 +315,127 @@ RuntimeException int age=10/0 这个是java运行时报出的运行时异常RunT
 
 https://github.com/alibaba/Sentinel/wiki/%E7%B3%BB%E7%BB%9F%E8%87%AA%E9%80%82%E5%BA%94%E9%99%90%E6%B5%81
 
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902150436808-1652434326.png)
+
+
 #### 各项配置参数说明
+- Load 自适应（仅对 Linux/Unix-like 机器生效）：系统的 load1 作为启发指标，进行自适应系统保护。当系统 load1 超过设定的启发值，且系统当前的并发线程数超过估算的系统容量时才会触发系统保护（BBR 阶段）。系统容量由系统的 maxQps * minRt 估算得出。设定参考值一般是 CPU cores * 2.5。
+
+- CPU usage（1.5.0+ 版本）：当系统 CPU 使用率超过阈值即触发系统保护（取值范围 0.0-1.0），比较灵敏。
+
+- 平均 RT：当单台机器上所有入口流量的平均 RT 达到阈值即触发系统保护，单位是毫秒。
+
+- 并发线程数：当单台机器上所有入口流量的并发线程数达到阈值即触发系统保护。
+
+- 入口 QPS：当单台机器上所有入口流量的 QPS 达到阈值即触发系统保护。
 
 
 #### 配置全局QPS
 
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902151301290-491597607.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902151356432-1486202955.png)
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902151408459-1244882970.png)
 
 
 ### @SentinelResource
+#### 按资源名称限流+后续处理
+
+- 启动Nacos成功
+
+- 启动Sentinel成功
+
+- Module
+
+springcloud-alibaba-sentinel-service8401
+
+POM
+```xml
+<!-- 引入自己定义的api通用包，可以使用Payment支付Entity -->
+<dependency>
+    <groupId>com.qcl.springcloud</groupId>
+    <artifactId>springcloud-api-commons</artifactId>
+    <version>${project.version}</version>
+</dependency>
+```
+
+YML
+```yml
+还是原来的配置
+```
+
+
+业务类RateLimitController
+
+**com.qcl.springcloud.alibaba.controller.RateLimitController**
+
+主启动
+
+**com.qcl.springcloud.alibaba.SentinelMain8401**
+
+
+- 配置流控规则
+
+`配置步骤`
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902153126481-447243204.png)
+
+
+`图形配置和代码关系`
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902224223232-1792994558.png)
+
+`表示一秒钟查询次数大于1,就跑到我们自定义的限流处`
+
+
+
+- 测试
+
+一秒钟点击一下
+
+超过上述，疯狂点击，返回了自己定义的限流处理信息，限流发生
+
+
+- 额外问题
+此时关闭服务8401
+
+Sentinel控制台,流控规则消失(临时/持久)
+
+
+
+#### 按照Url地址限流+后续处理
+
+通过访问的URL来限流，会返回Sentinel自带默认的限流处理信息
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902225131249-294299193.png)
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200902225844353-277505047.png)
+
+
+#### 上面兜底方案面临的问题
+
+- 1.系统默认的，没有体现我们自己的业务要求。
+
+- 2.依照现有条件，我们自定义的处理方法又和业务代码耦合在一块，不直观。
+
+- 3.每个业务方法都添加一个兜底的，那代码膨胀加剧。
+
+- 4.全局统一的处理方法没有体现。
+
+
+#### 客户自定义限流处理逻辑
+
+#### 创建CustomerBlockHandler类用于自定义限流处理逻辑
+
+自定义限流处理类
+1）
+RateLimitController了
+启动微服务后先调用一次
+1
+Sentinel控制台配置团
+测试后我们自定义的出来了
+进一步说明团
+
+#### 更多注解属性说明留
 
 
 ### 服务熔断功能
