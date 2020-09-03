@@ -25,6 +25,7 @@ public class IDDemo {
 
         long time = 2199023255551L;
         Date date = new Date();
+        System.out.println("当前时间戳:"+date.getTime());
         date.setTime(time);
         //能使用到:2039-09-07   开始1970-01-01
         System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(date));
