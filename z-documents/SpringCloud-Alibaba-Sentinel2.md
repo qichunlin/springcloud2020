@@ -8,6 +8,7 @@ https://www.bilibili.com/video/BV18E411x7eT?p=125
 https://www.bilibili.com/video/BV18E411x7eT?p=126
 https://www.bilibili.com/video/BV18E411x7eT?p=127
 https://www.bilibili.com/video/BV18E411x7eT?p=128
+https://www.bilibili.com/video/BV18E411x7eT?p=129
 
 
 ### 降级规则
@@ -424,19 +425,65 @@ Sentinel控制台,流控规则消失(临时/持久)
 
 #### 客户自定义限流处理逻辑
 
-#### 创建CustomerBlockHandler类用于自定义限流处理逻辑
+##### 创建CustomerBlockHandler类用于自定义限流处理逻辑
 
-自定义限流处理类
-1）
-RateLimitController了
-启动微服务后先调用一次
-1
-Sentinel控制台配置团
-测试后我们自定义的出来了
-进一步说明团
+##### 自定义限流处理类
 
-#### 更多注解属性说明留
+**com.qcl.springcloud.alibaba.myhandler.CustomerBlockHandler**
 
 
-### 服务熔断功能
+##### RateLimitController
+
+**com.qcl.springcloud.alibaba.controller.RateLimitController**
+
+
+##### 启动微服务后先调用一次
+
+http://localhost:8401/rateLimit/customerBlockHandler
+
+
+##### Sentinel控制台配置
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200903100424249-1974519168.png)
+
+##### 测试后我们自定义的出来了
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200903100445112-1301956621.png)
+
+##### 进一步说明
+业务和代码进行了解耦,避免代码膨胀
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200903100636537-1043071874.png)
+
+```
+@GetMapping("/rateLimit/customerBlockHandler")
+@SentinelResource(value = "customerBlockHandler",
+        blockHandlerClass = CustomerBlockHandler.class,
+        blockHandler = "handlerException2")
+```
+
+>blockHandlerClass 指定处理限流逻辑的类;blockHandler指定处理逻辑类里面的哪个方法名来处理
+
+
+
+#### 更多注解属性说明
+
+[查看官网-介绍](https://hub.fastgit.org/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D)
+
+[查看官网-注解支持](https://hub.fastgit.org/alibaba/Sentinel/wiki/%E6%B3%A8%E8%A7%A3%E6%94%AF%E6%8C%81)
+
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200903101348558-1045090863.png)
+
+[查看官网-如何使用](https://hub.fastgit.org/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8)
+
+![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200903101906783-1103561005.png)
+
+>所有的代码都要用try-catch-finally方式进行处理
+
+
+##### Sentinel三个核心的API
+- SphU定义资源
+
+- Tracer定义统过
+
+- ContextUtil定义了上下文
 

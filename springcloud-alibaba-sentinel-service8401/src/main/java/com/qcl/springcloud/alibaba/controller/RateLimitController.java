@@ -21,6 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RateLimitController {
 
+    /**
+     * 按资源名称限流
+     *
+     * @return
+     */
     @GetMapping("/byResource")
     @SentinelResource(value = "byResource", blockHandler = "handleException")
     public CommonResult byResource() {
@@ -31,6 +36,11 @@ public class RateLimitController {
         return new CommonResult(444, exception.getClass().getCanonicalName() + "\t 服务不可用");
     }
 
+    /**
+     * 按照Url地址限流
+     *
+     * @return
+     */
     @GetMapping("/rateLimit/byUrl")
     @SentinelResource(value = "byUrl")
     public CommonResult byUrl() {
@@ -38,6 +48,11 @@ public class RateLimitController {
     }
 
 
+    /**
+     * 自定义限流处理逻辑
+     *
+     * @return
+     */
     @GetMapping("/rateLimit/customerBlockHandler")
     @SentinelResource(value = "customerBlockHandler",
             blockHandlerClass = CustomerBlockHandler.class,
