@@ -31,12 +31,19 @@ public class CircleBreakerController {
     @Resource
     private RestTemplate restTemplate;
 
+    /**
+     * 测试服务熔断 fallback配置
+     *
+     * @param id
+     * @return
+     */
     @RequestMapping("/consumer/fallback/{id}")
-    //@SentinelResource(value = "fallback") //没有配置
+    //@SentinelResource(value = "fallback") //没有配置,代码运行时异常直接返回error page页面
     //@SentinelResource(value = "fallback",fallback = "handlerFallback") //fallback只负责业务异常
     //@SentinelResource(value = "fallback",blockHandler = "blockHandler") //blockHandler只负责sentinel控制台配置违规
+    //@SentinelResource(value = "fallback", fallback = "handlerFallback", blockHandler = "blockHandler") //fallback和blockHandler都配置的情况
     @SentinelResource(value = "fallback", fallback = "handlerFallback", blockHandler = "blockHandler",
-            exceptionsToIgnore = {IllegalArgumentException.class})
+            exceptionsToIgnore = {IllegalArgumentException.class}) //假如报该异常，不再有fallback方法兜底，没有降级效果了
     public CommonResult<Payment> fallback(@PathVariable Long id) {
 
         CommonResult<Payment> result = restTemplate.getForObject(SERVICE_URL + "/paymentSQL/" + id, CommonResult.class, id);
@@ -50,7 +57,7 @@ public class CircleBreakerController {
     }
 
     /**
-     * 本例是fallback
+     * 本例是fallback,不直接返回error page方法
      *
      * @param id
      * @param e
@@ -74,7 +81,8 @@ public class CircleBreakerController {
     }
 
     /**
-     * ==================OpenFeign
+     * ==================OpenFeign 测试
+     * http://localhost:84/consumer/paymentSQL/1
      */
     @Resource
     private PaymentService paymentService;

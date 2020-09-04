@@ -5,6 +5,8 @@ import com.qcl.springcloud.entities.Payment;
 import org.springframework.stereotype.Component;
 
 /**
+ * OpenFeign服务降级类
+ *
  * @author chunlin.qi@hand-china.com
  * @version 1.0
  * @description
