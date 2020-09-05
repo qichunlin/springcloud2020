@@ -40,6 +40,7 @@
         <module>springcloud-alibaba-provider-payment9004</module>
         <module>springcloud-alibaba-consumer-nacos-order84</module>
         <module>springboot-demo-interview</module>
+        <module>springcloud-seata-order-service2001</module>
     </modules>
 
     <!--统一管理jar包和版本-->
