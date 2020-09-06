@@ -671,64 +671,150 @@ config {
 
 **com.qcl.springcloud.alibaba.seata.SeataOrderMain2001**
 
-145开始
+
 
 #### 新建库存Storage-Module
 
 - 1.springcloud-seata-storage-service2002
 
 - 2.POM
+```xml
+<dependencies>
+    <!--nacos-->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+    <!--seata-->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        <exclusions>
+            <exclusion>
+                <artifactId>seata-all</artifactId>
+                <groupId>io.seata</groupId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>io.seata</groupId>
+        <artifactId>seata-all</artifactId>
+        <version>0.9.0</version>
+    </dependency>
+    <!--feign-->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-openfeign</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-starter</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.37</version>
+    </dependency>
+    <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid-spring-boot-starter</artifactId>
+        <version>1.1.10</version>
+    </dependency>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+```
 
 - 3.YML
 
+```yaml
+server:
+  port: 2002
+
+spring:
+  application:
+    name: springcloud-seata-storage-service
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: legend_tx_group
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seata_storage
+    username: root
+    password: 123456
+
+logging:
+  level:
+    io:
+      seata: info
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+```
+
 - 4.file.conf
 
+D:\WorkCode\ideaWork\springcloud2020\z-seata\conf\file.conf
+
+
 - 5.registry.conf
+
+D:\WorkCode\ideaWork\springcloud2020\z-seata\conf\registry.conf
+
 
 - 6.domain
 
 ![](https://img2020.cnblogs.com/blog/1231979/202009/1231979-20200904165249564-982714568.png)
 
-`CommonResult`
+`CommonResult`：com.qcl.springcloud.alibaba.domain.CommonResult
 
-`Order`
-
-
-
-- 7.Dao接口及实现
-
-- 8.Service接口及实现
-
-- 9.Controller
-
-- 10.Config配置
-
-- 11.主启动
+`Storage`：com.qcl.springcloud.alibaba.domain.Storage
 
 
-#### 新建账户Account-Module
-
-- 1.springcloud-seata-account-service2003
-
-- 2.POM
-
-- 3.YML
-
-- 4.file.conf
-
-- 5.registry.conf
-
-- 6.domain
 
 - 7.Dao接口及实现
 
+**com.qcl.springcloud.alibaba.dao.StorageDao**
+
+**D:\WorkCode\ideaWork\springcloud2020\springcloud-seata-storage-service2002\src\main\resources\mapper\StorageMapper.xml**
+
 - 8.Service接口及实现
+
+**com.qcl.springcloud.alibaba.service.impl.StorageServiceImpl**
+
+**com.qcl.springcloud.alibaba.service.StorageService**
+
 
 - 9.Controller
 
+**com.qcl.springcloud.alibaba.controller.StorageController**
+
+
 - 10.Config配置
+
+**com.qcl.springcloud.alibaba.config.MyBatisConfig**
+
+**com.qcl.springcloud.alibaba.config.DataSourceProxyConfig**
+
 
 - 11.主启动
 
+**com.qcl.springcloud.alibaba.SeataStorageServiceApplication2002**
 
-### Test
