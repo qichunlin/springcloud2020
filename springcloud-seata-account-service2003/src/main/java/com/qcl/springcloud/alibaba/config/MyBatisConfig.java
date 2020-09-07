@@ -10,6 +10,6 @@ import org.springframework.context.annotation.Configuration;
  * @date 2020/9/6
  */
 @Configuration
-@MapperScan({"com.qcl.springcloud.alibaba.dao.AccountDao"})
+@MapperScan({"com.qcl.springcloud.alibaba.dao"})
 public class MyBatisConfig {
 }

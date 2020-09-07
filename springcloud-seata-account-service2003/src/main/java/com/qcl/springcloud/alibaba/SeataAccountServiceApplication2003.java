@@ -7,8 +7,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
- * @auther zzyy
- * @create 2019-12-13 21:59
+ * @author chunlin.qi@hand-china.com
+ * @version 1.0
+ * @description
+ * @date 2020/9/6
  */
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 @EnableDiscoveryClient
